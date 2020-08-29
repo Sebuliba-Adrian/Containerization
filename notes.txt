@@ -54,3 +54,104 @@ If we do not spcify CMD instruction in the Dockerfile, Docker will use the defau
 The CMD instuction doesnot run when building the image it  only runs when the continer startsup
 
 You can specify the command in t=either the exec form which is prefered or in shell form
+
+COPY instuction:
+Copies new files or directories from build contexr and adds them to the file system of the container.
+COPY abc.txt /src/abc.txt
+
+Docker compose is a tool for defining and running multiple continer docker applications 
+
+We define the services that makeup our applications. For each service we define instructions about how to build and run the contianer 
+The build insturction defines the path to the docker file which we used to build the dockerapp image
+The port instruction is analogus to the -p argument of the docker run command 
+host port : container port- here we just type "5000:5000" to expose container port 5000 to host port 5000
+depends_on: to express th dependency between the redis service and the dockerapp service 
+Because our docker app container is effectively a client of the redis container 
+We want to start the redis contner before the dockerapp service continer 
+docker compose will start services in the dependeny order defined in the depends on section
+
+All services will either need image or build instructions 
+
+Befor we use docker compose up to bring uo all the containers, make sure we have stopped all the running ontimers in the previous run to avoi dport conflict
+run docker ps to find out 
+docker stop <contianer id2> <container id2>, ...
+
+Typical Docker compose workflow:
+- $ls
+- docker-compose up -d 
+- docker-compose ps
+- docker-compose logs
+- docker-compose stop
+- docker-compose rm --all
+- docker-compose ps
+
+docker compose up doesnot rebuild the image if the image already exists
+Test:
+vi Dockerfile changes some thing
+docker-compose up -d
+docker ps // you will find that the changes did not take effect
+docker exec -it c134590429 bash
+exist
+To force docker to rebuild the image we use the dockerr compose rebuild command 
+
+docker compose build
+
+Now if we rerun docker-compose up
+
+We see recreation
+
+docker ps
+
+Docker networking:
+
+$ docker network ls
+- None network, most secure
+- Bridge network
+Docker automaticall cretes a default network called bridge 
+$ docker network inspect bridge
+
+  "IPv4Address": "172.17.0.2/16",
+  IP range is from 172.17.0.0 - 172.17.255.255
+  $docker run -d --name contianer_1 busybox sleep 1000 
+  $docker exec -t contianer_1 ifconfig // You will see two network interfaces, loopback intern=face, and bridge network interface
+  $docker run -d --name contianer_2 busybox sleep 1000// second contianer 
+  $docker exec -t contianer_2 ifconfig
+
+Now you can reach contiainer_1 form contiainer_2 and vice verser since they are both on the same network
+
+Letw create another network:
+
+$docker network create --driver bridge my_bridge_network
+$docker ls
+$ docker inspect network my_bridge_network
+ "Subnet": "172.18.0.0/16",
+"Gateway": "172.18.0.1"
+$ docker run -d --name continer_3 --net my_bridge_network busybox sleep 1000
+
+$docker exec -it container_3 ifconfig
+$docker inspect contiainer_1 
+
+ping container 1 from container_3
+
+$docker exec -it container_3 ping 172.17.0.2
+
+$docker network connect brdge continer_3
+$docker exec -it continer_3 ifconfig
+And now it should connect
+
+$docker exec -it continer_3 ping 172.17.0.3
+should be able to ping 
+To disconnect
+$ docker network disconnect bridge container_3
+\Now if we list the network interfaces
+
+$docker exec -it container_3 ifconfig
+
+
+Overly network
+Supports mutihost networking out of the busybox
+
+Require some preexisting conditions before it can be created
+Widely used in production
+
+Define Container Networks with Docker compose
