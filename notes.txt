@@ -1,0 +1,56 @@
+A docker image is made up of a list of read only layers that represent filesystem differences
+
+Ways to Build a Docker Image:
+- Commit changes made in a docker contianer
+- Write a Dockerfile
+
+-
+$docker run -it debian:jessie
+#ls
+#git
+#apt-get update && apt-get install -y git
+
+commit container as a new docker image
+
+Docker Commit:
+- Saves the changes we made to the docker containers filesystem to a new image.
+When running the command, we specify the id of the container we are committing and repository and tag of the new image
+Dcoker commits our changes to a new image 
+Images are made of the filesystem layers 
+Now we cn spin up a continer based o this new image
+New continer will now ba
+
+docker commit container_id repository_name:tag
+
+docker ps -a gives you the id of the running container
+
+Next we need to provide the repository name and the image tag
+
+We can now spin up a continer based off the new image
+docker run -it jameslee/debioan:1.00
+
+docker images
+You will find that you have extended the base image with a new layer
+
+Building a docker image using Dockerfile
+- A Dockerfile is a text document that contians all the instructions users provide to assemble an image
+
+Each instruction will create a new image layer to the image
+instructions specify what to do when building the image
+The Dockerfile always starts with FROM to specify the base image form which you are building.
+
+Docker build context:
+
+- Docker build command takes the path to the build contxet as an argument
+For example if we would like to copy some source code form the local disk to the contianer, those files must exist in the build context path
+docker images
+
+CMD instructions:
+
+Specifies what command you want to run when the continer starts up
+
+If we do not spcify CMD instruction in the Dockerfile, Docker will use the default command defined in the base image
+
+The CMD instuction doesnot run when building the image it  only runs when the continer startsup
+
+You can specify the command in t=either the exec form which is prefered or in shell form
